@@ -1,0 +1,26 @@
+{
+  "name": "linde-luis",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/main.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.16.0",
+    "botbuilder": "^3.7.0",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.0",
+    "dotenv-extended": "^1.0.4",
+    "express": "~4.14.1",
+    "jade": "~1.11.0",
+    "mongoose": "^4.9.0",
+    "morgan": "~1.7.0",
+    "q": "^1.4.1",
+    "request-promise": "^4.1.1",
+    "restify": "^4.3.0",
+    "serve-favicon": "~2.3.2",
+    "swagger-client": "^2.1.32",
+    "weixin-robot": "^0.5.10",
+    "mongodb": "latest"
+  }
+}
