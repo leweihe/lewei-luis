@@ -1,31 +1,12 @@
 var http = require('http');
 var qs = require('querystring');
 var Q = require('q');
-var MongoClient = require('mongodb').MongoClient;
-
-var findAllBusRoute = function() {
-    var deferred = Q.defer();
-    MongoClient.connect('mongodb://localhost:27017/test', function(err, db) {
-        var collection = db.collection('busRouteDTO');
-        var whereStr = {};
-        var queryResult = [];
-        collection.find(whereStr,function(error, cursor){
-            cursor.each(function(error,doc) {
-                if (doc) {
-                    queryResult.push(doc);
-                }
-                deferred.resolve(queryResult);
-            });
-        });
-        db.close();
-    });
-    return deferred.promise;
-};
+var mongod = require('./mongod.js');
 
 exports.getAmapCard = function (session, builder, dest) {
     var result = [];
     var deferred = Q.defer();
-    findAllBusRoute().then(function(busRoutes){
+    mongod.findAllBusRoute().then(function(busRoutes){
         var queryPoint = session.userData.possiblePoints[0];
         var busRoute = calcBusRoute(queryPoint, busRoutes);
 

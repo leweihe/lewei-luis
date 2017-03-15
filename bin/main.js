@@ -33,43 +33,37 @@ var connector = new builder.ChatConnector({
 });
 server.post('/api/messages', connector.listen());
 
-var instructions = '提供一个地址,我将帮助你定位最便捷的班车.';
+var instructions = '提供一个地址,我将帮助你定位最便捷的班车, mortal.';
 
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
+bot.recognizer(recognizer);
 
-var intents = new builder.IntentDialog({recognizers: [recognizer]});
+bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
+    matches: '路线查询'
+});
 
-bot.dialog('/', intents);
-
-intents.matches('路线查询', [queryPath, choiceExactDest]);
-
-function queryPath(session, args, next) {
+function queryPath(session, args) {
     //init userData
-    if (!session.userData.possiblePoints) {
-        session.userData.possiblePoints = [];
-        var entities = builder.EntityRecognizer.findAllEntities(args.entities, '地点');
+    var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
 
-        if (entities.length == 0) {
-            entities = [session.message.text];
-        }
-
-        amap.searchInAmap(entities).then(function (dests) {
-            var options = [];
-            dests.forEach(function (dest, index) {
-                options.push(dest.name);
-            });
-            session.userData.possiblePoints = dests;
-            if (options.length > 0){
-                builder.Prompts.choice(session, "我为您列出了以下为三个可能的路径,请选择.", options);
-            } else {
-                var reply = new builder.Message().address(session.message.address).text('对不起,没有找到你所提问的地址,请重试.');
-                bot.send(reply);
-            }
-        });
-    } else {
-        next();
+    if (entities.length == 0) {
+        entities = [session.message.text];
     }
+
+    amap.searchInAmap(entities).then(function (dests) {
+        var options = [];
+        dests.forEach(function (dest, index) {
+            options.push(dest.name);
+        });
+        session.userData.possiblePoints = dests;
+        if (options.length > 0){
+            builder.Prompts.choice(session, "我为您列出了以下为三个可能的路径,请选择, mortal", options);
+        } else {
+            var reply = new builder.Message().address(session.message.address).text('对不起,我腿脚不好,没听清, mortal');
+            bot.send(reply);
+        }
+    });
 }
 
 function choiceExactDest(session, result) {
@@ -77,14 +71,17 @@ function choiceExactDest(session, result) {
     amap.getAmapCard(session, builder, result.response).then(function (amapCards) {
         reply.attachmentLayout(builder.AttachmentLayout.carousel).attachments(amapCards);
         session.send(reply);
+        session.endDialog("很高兴为您服务, mortal.");
     });
 }
 
-intents.matches('天气查询', [function (session, args, next) {
+bot.dialog('searchWeather', [function (session, args) {
     var reply = new builder.Message().address(session.message.address);
     reply.text('为您查询天气');
     session.send(reply);
-}]);
+}]).triggerAction({
+    matches: '天气查询'
+});
 
 bot.on('conversationUpdate', function (activity) {
     // when user joins conversation, send instructions
