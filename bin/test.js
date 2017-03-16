@@ -11,7 +11,7 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
     main();
 });
 
-exports.searchDataInAmap = function() {
+exports.searchDataInAmap = function () {
     var deferred = Q.defer();
     //读取文件
     var apiData = {
@@ -28,7 +28,7 @@ exports.searchDataInAmap = function() {
         method: 'GET'
     };
     var req = http.request(options, function (res) {
-        var responseText='';
+        var responseText = '';
         res.on('data', function (data) {
             responseText += data;
         });
@@ -46,13 +46,13 @@ exports.searchDataInAmap = function() {
 };
 
 
-var main = function() {
+var main = function () {
     exports.searchDataInAmap().then(function (result) {
         var abc = '';
         result.districts[0].districts.forEach(function (result) {
-                    abc += result.name + ',';
+            abc += result.name + ',';
             result.districts.forEach(function (result) {
-                    abc += result.name + ',';
+                abc += result.name + ',';
             });
         });
         console.log('end')

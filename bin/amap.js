@@ -6,7 +6,7 @@ var mongod = require('./mongod.js');
 exports.getAmapCard = function (session, builder, dest) {
     var result = [];
     var deferred = Q.defer();
-    mongod.findAllBusRoute().then(function(busRoutes){
+    mongod.findAllBusRoute().then(function (busRoutes) {
         var queryPoint = session.userData.possiblePoints[0];
         var busRoute = calcBusRoute(queryPoint, busRoutes);
 
@@ -25,11 +25,11 @@ exports.getAmapCard = function (session, builder, dest) {
     return deferred.promise;
 };
 
-var calcBusRoute = function(queryPoint, busRoutes) {
+var calcBusRoute = function (queryPoint, busRoutes) {
     return busRoutes[0];
 };
 
-exports.searchInAmap = function(dests) {
+exports.searchInAmap = function (dests) {
     var deferred = Q.defer();
     //读取文件
     var keywords = '';
@@ -52,12 +52,12 @@ exports.searchInAmap = function(dests) {
     };
     var result = [];
     var req = http.request(options, function (res) {
-        var responseText='';
+        var responseText = '';
         res.on('data', function (data) {
             responseText += data;
         });
         res.on('end', function () {
-            JSON.parse(responseText).pois.forEach(function(point) {
+            JSON.parse(responseText).pois.forEach(function (point) {
                 result.push(point)
             });
             deferred.resolve(result);

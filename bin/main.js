@@ -57,7 +57,7 @@ function queryPath(session, args) {
             options.push(dest.name);
         });
         session.userData.possiblePoints = dests;
-        if (options.length > 0){
+        if (options.length > 0) {
             builder.Prompts.choice(session, "我为您列出了以下为三个可能的路径,请选择, mortal", options);
         } else {
             var reply = new builder.Message().address(session.message.address).text('对不起,我腿脚不好,没听清, mortal');
@@ -199,7 +199,7 @@ function pollMessages(client, conversationId) {
                 watermark = response.obj.watermark;                                 // use watermark so subsequent requests skip old messages
                 return response.obj.activities;
             });
-            // .then(printMessages);
+        // .then(printMessages);
     }, pollInterval);
 }
 
