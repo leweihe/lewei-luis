@@ -40,7 +40,7 @@ exports.getAmapCard = function (session, builder, dest) {
 };
 var calcBusRoute = function (queryPoint, busRoutes) {
     var deferred = Q.defer();
-    var nearestStation;
+    var nearestStation = {};
     var stations = [];
     busRoutes.forEach(function (route, index) {
         route.stations.forEach(function (station) {
@@ -63,7 +63,7 @@ var calcBusRoute = function (queryPoint, busRoutes) {
             }
         });
         console.log('the shortest one is ' + shortestDist + ' and the index is ' + shortestInd);
-        console.log('the nearest station is : ' + stations[shortestInd].keyword);
+
         nearestStation = stations[shortestInd];
         deferred.resolve(nearestStation);
     });
@@ -99,9 +99,12 @@ var getAllDistance = function (queryPoint, stations) {
             responseText += data;
         });
         res.on('end', function () {
-            JSON.parse(responseText).results.forEach(function (point) {
-                result.push(point)
-            });
+            var response = JSON.parse(responseText);
+            if(response.results) {
+                response.results.forEach(function (point) {
+                    result.push(point)
+                });
+            }
             deferred.resolve(result);
         });
 
