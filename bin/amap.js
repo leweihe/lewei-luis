@@ -15,24 +15,28 @@ exports.getAmapCard = function (session, builder, dest) {
     mongod.findAllBusRoute().then(function (busRoutes) {
         var queryPoint = session.userData.possiblePoints[dest.index];
         calcBusRoute(queryPoint, busRoutes).then(function (nearestStation) {
-            var chosenOne = {};
-            busRoutes.forEach(function (route) {
-                route.stations.forEach(function (station) {
-                    if (station === nearestStation) {
-                        chosenOne = route;
-                    }
+            if (nearestStation) {
+                var chosenOne = {};
+                busRoutes.forEach(function (route) {
+                    route.stations.forEach(function (station) {
+                        if (station === nearestStation) {
+                            chosenOne = route;
+                        }
+                    });
                 });
-            });
-            result.push(new builder.HeroCard(session)
-                .title('去[' + dest.entity + ']的最佳路线为[' + chosenOne ? chosenOne.routeName : '' + ']路班车')
-                .subtitle('建议站点为[' + nearestStation.keyword + ']')
-                // .text('建议您乘坐XXX路班车')
-                // .images([
-                //     builder.CardImage.create(session, 'https://docs.microsoft.com/en-us/azure/storage/media/storage-introduction/storage-concepts.png')
-                // ])
-                .buttons([
-                    builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + nearestStation.lng + '&lat=' + nearestStation.lat, '查看路线')
-                ]));
+                result.push(new builder.HeroCard(session)
+                    .title('去[' + dest.entity + ']的最佳路线为[' + chosenOne ? chosenOne.routeName : '' + ']路班车')
+                    .subtitle('建议站点为[' + nearestStation.keyword + ']')
+                    .buttons([
+                        builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + nearestStation.lng + '&lat=' + nearestStation.lat, '查看路线')
+                    ]));
+            } else {
+                result.push(new builder.ThumbnailCard(session)
+                    .title('对不起,没有找到合适的路线,建议使用在线版')
+                    .buttons([
+                        builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL, '在线查询')
+                    ]));
+            }
             deferred.resolve(result);
         });
     });
