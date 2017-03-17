@@ -31,7 +31,7 @@ exports.getAmapCard = function (session, builder, dest) {
                 //     builder.CardImage.create(session, 'https://docs.microsoft.com/en-us/azure/storage/media/storage-introduction/storage-concepts.png')
                 // ])
                 .buttons([
-                    builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + nearestStation.lng + 'lat=' + nearestStation.lat, '查看路线')
+                    builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + nearestStation.lng + '&lat=' + nearestStation.lat, '查看路线')
                 ]));
             deferred.resolve(result);
         });
