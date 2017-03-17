@@ -7,7 +7,27 @@ var Q = require('q');
 
 exports.findAllBusRoute = function () {
     var deferred = Q.defer();
-    MongoClient.connect(process.env.DOCUMENT_DB_HOST + '/test', function (err, db) {
+    MongoClient.connect(process.env.DOCUMENT_DB_HOST + process.env.DOCUMENT_DB_DATABASE, function (err, db) {
+        console.log('mongo db connected');
+        var collection = db.collection('busRouteDTO');
+        var whereStr = {};
+        var queryResult = [];
+        collection.find(whereStr, function (error, cursor) {
+            cursor.each(function (error, doc) {
+                if (doc) {
+                    queryResult.push(doc);
+                }
+                deferred.resolve(queryResult);
+            });
+        });
+        db.close();
+    });
+    return deferred.promise;
+};
+
+exports.backdoorVarify = function () {
+    var deferred = Q.defer();
+    MongoClient.connect(process.env.DOCUMENT_DB_HOST + process.env.DATABASE, function (err, db) {
         var collection = db.collection('busRouteDTO');
         var whereStr = {};
         var queryResult = [];

@@ -1,5 +1,7 @@
 // This loads the environment variables from the .env file
-require('dotenv-extended').load();
+require('dotenv-extended').load({
+    errorOnMissing: true
+});
 
 var express = require('express');
 
@@ -14,6 +16,9 @@ var restify = require('restify');
 // var webot = require('weixin-robot');
 
 var amap = require('./amap.js');
+var whether = require('./whether.js');
+
+var mongod = require('./mongod');
 
 //LUIS
 var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/aac6c13c-63dc-444e-8f61-7ac4b97fa5ca?subscription-key=96429d5c0efc4cb692dddde6677c0f98&verbose=true&q=';
@@ -31,6 +36,7 @@ var connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
 server.post('/api/messages', connector.listen());
 
 var instructions = '提供一个地址,我将帮助你定位最便捷的班车, mortal.';
@@ -54,7 +60,7 @@ function queryPath(session, args) {
     amap.searchInAmap(entities).then(function (dests) {
         var options = [];
         dests.forEach(function (dest, index) {
-            options.push(dest.name);
+            options.push(dest.name + ' [' + dest.adname + ']');
         });
         session.userData.possiblePoints = dests;
         if (options.length > 0) {
@@ -76,12 +82,30 @@ function choiceExactDest(session, result) {
 }
 
 bot.dialog('searchWeather', [function (session, args) {
+
     var reply = new builder.Message().address(session.message.address);
     reply.text('为您查询天气');
     session.send(reply);
 }]).triggerAction({
     matches: '天气查询'
 });
+
+bot.dialog('backdoor', [function (session, args) {
+    mongod.backdoorVarify().then(function (data) {
+        var reply = new builder.Message().address(session.message.address);
+        reply.text(data);
+        session.send(reply);
+    })
+
+}]).triggerAction({
+    matches: 'backdoor'
+});
+
+bot.dialog('/', [function (session, args) {
+    var reply = new builder.Message().address(session.message.address);
+    reply.text('Hi, mortal');
+    session.send(reply);
+}]);
 
 bot.on('conversationUpdate', function (activity) {
     // when user joins conversation, send instructions
@@ -128,7 +152,7 @@ directLineClient.then(function (client) {
             return response.obj.conversationId;
         })                            // obtain id
         .then(function (conversationId) {
-            // sendMessagesFromConsole(client, conversationId);                        // start watching console input for sending new messages to bot
+            sendMessagesFromConsole(client, conversationId);                        // start watching console input for sending new messages to bot
             pollMessages(client, conversationId);                                   // start polling messages from bot
         });
 });
