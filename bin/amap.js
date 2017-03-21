@@ -28,7 +28,7 @@ exports.getAmapCard = function (session, builder, dest) {
                     .title('去[' + dest.entity + ']的最佳路线为[' + chosenOne ? chosenOne.routeName : '' + ']路班车')
                     .subtitle('建议站点为[' + nearestStation.keyword + ']')
                     .buttons([
-                        builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + nearestStation.lng + '&lat=' + nearestStation.lat, '查看路线')
+                        builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + queryPoint.location.split(',')[0] + '&lat=' + queryPoint.location.split(',')[1], '查看路线')
                     ]));
             } else {
                 result.push(new builder.ThumbnailCard(session)

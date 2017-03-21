@@ -103,7 +103,12 @@ bot.dialog('backdoor', [function (session, args) {
 
 bot.dialog('/', [function (session, args) {
     var reply = new builder.Message().address(session.message.address);
-    reply.text('Hi, mortal');
+    reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
+        .title('我没法识别您所说的语言,请试试使用更简单的句子或者当前位置来查询.')
+        .subtitle('例:[厦门软件园怎么走]')
+        .buttons([
+            builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
+        ]));
     session.send(reply);
 }]);
 
