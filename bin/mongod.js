@@ -7,9 +7,12 @@ var Q = require('q');
 
 exports.findAllBusRoute = function () {
     var deferred = Q.defer();
+    console.log(process.env.DOCUMENT_DB_HOST);
     MongoClient.connect(process.env.DOCUMENT_DB_HOST, function (err, db) {
-        console.log('mongo db connected' + db);
+        if(err) throw err;
+        console.log('mongo db connected ' + db + ' ' + err);
         var collection = db.collection('busRouteDTO');
+        console.log(collection);
         var whereStr = {};
         var queryResult = [];
         collection.find(whereStr, function (error, cursor) {
