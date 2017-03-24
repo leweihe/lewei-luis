@@ -5,10 +5,6 @@ require('dotenv-extended').load({
 
 var express = require('express');
 
-//utils
-var Swagger = require('swagger-client');
-var rp = require('request-promise');
-
 //botframework
 var builder = require('botbuilder');
 var restify = require('restify');
@@ -53,7 +49,7 @@ function queryPath(session, args) {
     //init userData
     var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
 
-    if (entities.length == 0) {
+    if (entities.length === 0) {
         entities = [session.message.text];
     }
 
@@ -124,6 +120,10 @@ bot.on('conversationUpdate', function (activity) {
     }
 });
 
+
+//utils
+var Swagger = require('swagger-client');
+var rp = require('request-promise');
 /*
  for client
  */
@@ -153,13 +153,13 @@ var directLineClient = rp(directLineSpecUrl)
 // once the client is ready, create a new conversation
 directLineClient.then(function (client) {
     client.Conversations.Conversations_StartConversation()                          // create conversation
-        .then(function (response) {
-            return response.obj.conversationId;
-        })                            // obtain id
-        .then(function (conversationId) {
-            sendMessagesFromConsole(client, conversationId);                        // start watching console input for sending new messages to bot
-            pollMessages(client, conversationId);                                   // start polling messages from bot
-        });
+    .then(function (response) {
+        return response.obj.conversationId;
+    })                            // obtain id
+    .then(function (conversationId) {
+        sendMessagesFromConsole(client, conversationId);                        // start watching console input for sending new messages to bot
+        pollMessages(client, conversationId);                                   // start polling messages from bot
+    });
 });
 
 // Read from console (stdin) and send input to conversation using DirectLine client
@@ -167,8 +167,7 @@ function sendMessagesFromWeichat(client, conversationId) {
     //get weichat input
     var input = '';
     // send message
-    client.Conversations.Conversations_PostActivity(
-        {
+    client.Conversations.Conversations_PostActivity({
             conversationId: conversationId,
             activity: {
                 textFormat: 'plain',
