@@ -62,7 +62,13 @@ function queryPath(session, args) {
         if (options.length > 0) {
             builder.Prompts.choice(session, "我为您列出了以下为三个可能的路径,请选择, mortal", options);
         } else {
-            var reply = new builder.Message().address(session.message.address).text('对不起,我腿脚不好,没听清, mortal');
+            var reply = new builder.Message().address(session.message.address);
+            reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
+                .title('我没法识别您所说的语言,请换一种说法,或者直接使用当前位置, mortal')
+                .subtitle('例:[厦门软件园怎么走]')
+                .buttons([
+                    builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
+                ]));
             bot.send(reply);
         }
     });
@@ -100,7 +106,7 @@ bot.dialog('backdoor', [function (session, args) {
 bot.dialog('/', [function (session, args) {
     var reply = new builder.Message().address(session.message.address);
     reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
-        .title('我没法识别您所说的语言,请试试使用更简单的句子或者当前位置来查询.')
+        .title('我没法识别您所说的语言,请换一种说法,或者直接使用当前位置, mortal')
         .subtitle('例:[厦门软件园怎么走]')
         .buttons([
             builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
