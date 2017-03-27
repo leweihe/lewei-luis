@@ -84,7 +84,7 @@ function choiceExactDest(session, result) {
 }
 
 bot.dialog('searchWeather', [function (session, args) {
-    console.log('正在查询天气' + ', 并返回给' + session.message.address);
+    console.log('正在查询天气' + ', 并返回给' + JSON.stringify(session.message.address));
     var reply = new builder.Message().address(session.message.address);
     reply.text('为您查询天气');
     session.send(reply);
