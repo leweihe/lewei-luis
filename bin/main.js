@@ -79,7 +79,7 @@ function choiceExactDest(session, result) {
     amap.getAmapCard(session, builder, result.response).then(function (amapCards) {
         reply.attachmentLayout(builder.AttachmentLayout.carousel).attachments(amapCards);
         session.send(reply);
-        session.endDialog("很高兴为您服务, mortal.");
+        session.end();
     });
 }
 
