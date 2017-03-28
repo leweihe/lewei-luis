@@ -113,15 +113,15 @@ bot.dialog('/', [function (session, args) {
         ]));
     session.send(reply);
 }]);
-
-bot.on('conversationUpdate', function (activity) {
-    // when user joins conversation, send instructions
-    if (activity.membersAdded) {
-        activity.membersAdded.forEach(function (identity) {
-            if (identity.id === activity.address.bot.id) {
-                var reply = new builder.Message().address(activity.address).text(instructions);
-                bot.send(reply);
-            }
-        });
-    }
-});
+//
+// bot.on('conversationUpdate', function (activity) {
+//     // when user joins conversation, send instructions
+//     if (activity.membersAdded) {
+//         activity.membersAdded.forEach(function (identity) {
+//             if (identity.id === activity.address.bot.id) {
+//                 var reply = new builder.Message().address(activity.address).text(instructions);
+//                 bot.send(reply);
+//             }
+//         });
+//     }
+// });
