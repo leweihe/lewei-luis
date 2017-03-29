@@ -35,7 +35,7 @@ var connector = new builder.ChatConnector({
 
 server.post('/api/messages', connector.listen());
 
-var instructions = '提供一个地址,我将帮助你定位最便捷的班车, mortal.';
+var instructions = '您好,请问需要什么帮助?';
 
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
@@ -60,19 +60,21 @@ function queryPath(session, args) {
         });
         session.userData.possiblePoints = dests;
         if (options.length > 0) {
-            builder.Prompts.choice(session, "我为您列出了以下为三个可能的路径,请选择, mortal", options);
+            builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
         } else {
-            var reply = new builder.Message().address(session.message.address);
-            reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
-                .title('我没法识别您所说的语言,请换一种说法,或者直接使用当前位置, mortal')
-                .subtitle('例:[厦门软件园怎么走]')
-                .buttons([
-                    builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
-                ]));
-            bot.send(reply);
+            bot.send(buildCard4Unknown(session));
         }
     });
 }
+
+var buildCard4Unknown = function (session) {
+    var reply = new builder.Message().address(session.message.address);
+    reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
+        .title('请告诉我们完整的地址,或者直接使用当前位置')
+        .buttons([
+            builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
+        ]));
+};
 
 function choiceExactDest(session, result) {
     var reply = new builder.Message().address(session.message.address);
@@ -104,24 +106,17 @@ bot.dialog('backdoor', [function (session, args) {
 });
 
 bot.dialog('/', [function (session, args) {
-    var reply = new builder.Message().address(session.message.address);
-    reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
-        .title('我没法识别您所说的语言,请换一种说法,或者直接使用当前位置, mortal')
-        .subtitle('例:[厦门软件园怎么走]')
-        .buttons([
-            builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
-        ]));
-    session.send(reply);
+    session.send(bot.send(buildCard4Unknown(session)));
 }]);
-//
-// bot.on('conversationUpdate', function (activity) {
-//     // when user joins conversation, send instructions
-//     if (activity.membersAdded) {
-//         activity.membersAdded.forEach(function (identity) {
-//             if (identity.id === activity.address.bot.id) {
-//                 var reply = new builder.Message().address(activity.address).text(instructions);
-//                 bot.send(reply);
-//             }
-//         });
-//     }
-// });
+
+bot.on('conversationUpdate', function (activity) {
+    // when user joins conversation, send instructions
+    if (activity.membersAdded) {
+        activity.membersAdded.forEach(function (identity) {
+            if (identity.id === activity.address.bot.id) {
+                var reply = new builder.Message().address(activity.address).text(instructions);
+                bot.send(reply);
+            }
+        });
+    }
+});
