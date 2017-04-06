@@ -45,7 +45,7 @@ bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
 });
 
-bot.dialog('searchPath', [queryPath4None, choiceExactDest]).triggerAction({
+bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
     matches: 'None'
 });
 
