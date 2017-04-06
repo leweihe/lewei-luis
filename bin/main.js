@@ -40,7 +40,11 @@ var instructions = '您好,请问需要什么帮助?';
 var bot = new builder.UniversalBot(connector);
 
 var recognizer = new builder.LuisRecognizer(model);
-var dialog = bot.recognizer(recognizer);
+var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
+bot.dialog('/', dialog);
+dialog.onDefault(builder.DialogAction.send("I'm sorry I didn't understand. I can only create & delete alarms."));
+
+bot.recognizer(recognizer);
 
 bot.dialog('Help', function (session) {
     session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
