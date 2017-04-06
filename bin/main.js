@@ -19,7 +19,6 @@ var mongod = require('./mongod');
 //LUIS
 var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/aac6c13c-63dc-444e-8f61-7ac4b97fa5ca?subscription-key=96429d5c0efc4cb692dddde6677c0f98&verbose=true&q=';
 
-var recognizer = new builder.LuisRecognizer(model);
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -38,10 +37,9 @@ server.post('/api/messages', connector.listen());
 var instructions = '您好,请问需要什么帮助?';
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector, function (session) {
-    session.send('哎呀, 我听不懂你说的\'%s\'. 需要更多支持请回复 \'help\' .', session.message.text);
-});
+var bot = new builder.UniversalBot(connector);
 
+var recognizer = new builder.LuisRecognizer(model);
 bot.recognizer(recognizer);
 
 bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
