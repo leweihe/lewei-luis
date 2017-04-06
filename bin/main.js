@@ -45,16 +45,33 @@ bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
 });
 
-bot.dialog('searchPath4None', [queryPath, choiceExactDest]).triggerAction({
+bot.dialog('searchPath', [queryPath4None, choiceExactDest]).triggerAction({
     matches: 'None'
 });
+
+function queryPath4None(session, args) {
+    //init userData
+    console.log(JSON.stringify(args));
+    var entities = [session.message.text];
+    amap.searchInAmap(entities).then(function (dests) {
+        var options = [];
+        dests.forEach(function (dest, index) {
+            options.push(dest.name + ' [' + dest.adname + ']');
+        });
+        session.userData.possiblePoints = dests;
+        if (options.length > 0) {
+            builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
+        } else {
+            bot.send(buildCard4Unknown(session));
+        }
+    });
+}
 
 function queryPath(session, args) {
     //init userData
     var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
 
-    console.log(JSON.stringify(entities));
-    if (!entities || entities.length === 0) {
+    if (entities.length === 0) {
         entities = [session.message.text];
     }
 
