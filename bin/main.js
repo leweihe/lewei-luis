@@ -37,10 +37,18 @@ server.post('/api/messages', connector.listen());
 var instructions = '您好,请问需要什么帮助?';
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector, buildCard4Unknown);
+var bot = new builder.UniversalBot(connector);
 
 var recognizer = new builder.LuisRecognizer(model);
-bot.recognizer(recognizer);
+var dialog = bot.recognizer(recognizer);
+
+bot.dialog('Help', function (session) {
+    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
+}).triggerAction({
+    matches: 'Help'
+});
+
+dialog.onDefault([queryPath4None, choiceExactDest]);
 
 bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
@@ -142,10 +150,3 @@ bot.dialog('backdoor', [function (session, args) {
 //         });
 //     }
 // });
-
-
-bot.dialog('Help', function (session) {
-    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
-}).triggerAction({
-    matches: 'Help'
-});
