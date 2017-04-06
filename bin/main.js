@@ -48,7 +48,7 @@ bot.dialog('Help', function (session) {
     matches: 'Help'
 });
 
-dialog.onDefault([queryPath4None, choiceExactDest]);
+dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
 
 bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
