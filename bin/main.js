@@ -45,6 +45,10 @@ bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
 });
 
+bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
+    matches: 'None'
+});
+
 function queryPath(session, args) {
     //init userData
     var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
