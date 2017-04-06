@@ -68,7 +68,7 @@ function queryPath4None(session, args) {
 }
 
 function queryPath(session, args) {
-    var entities = [session.message.text];
+    var entities = [{entity: session.message.text, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
 
     if (args && args.intent && args.intent.entities) {
     //init userData
