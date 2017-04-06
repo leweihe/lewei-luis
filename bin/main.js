@@ -37,7 +37,7 @@ server.post('/api/messages', connector.listen());
 var instructions = '您好,请问需要什么帮助?';
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector);
+var bot = new builder.UniversalBot(connector, buildCard4Unknown);
 
 var recognizer = new builder.LuisRecognizer(model);
 bot.recognizer(recognizer);
@@ -130,9 +130,6 @@ bot.dialog('backdoor', [function (session, args) {
     matches: 'backdoor'
 });
 
-bot.dialog('/', [function (session, args) {
-    session.send(bot.send(buildCard4Unknown(session)));
-}]);
 //
 // bot.on('conversationUpdate', function (activity) {
 //     // when user joins conversation, send instructions
