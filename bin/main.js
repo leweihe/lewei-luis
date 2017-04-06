@@ -47,13 +47,13 @@ bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
 });
 
 bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
-    matches: 'none'
+    matches: 'None'
 });
 
 function queryPath4None(session, args) {
     //init userData
-    console.log(JSON.stringify(args));
-    var entities = [session.message.text];
+    var entities = [{entity: session.message.text, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
+    console.log(JSON.stringify(entities));
     amap.searchInAmap(entities).then(function (dests) {
         var options = [];
         dests.forEach(function (dest, index) {
