@@ -68,12 +68,14 @@ function queryPath4None(session, args) {
 }
 
 function queryPath(session, args) {
-    //init userData
-    var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
+    var entities = [session.message.text];
 
-    if (entities.length === 0) {
-        entities = [session.message.text];
+    if (args && args.intent && args.intent.entities) {
+    //init userData
+        entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
     }
+
+    console.log(JSON.stringify(entities));
 
     amap.searchInAmap(entities).then(function (dests) {
         var options = [];
