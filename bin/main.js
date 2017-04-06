@@ -38,7 +38,10 @@ server.post('/api/messages', connector.listen());
 var instructions = '您好,请问需要什么帮助?';
 
 // Create your bot with a function to receive messages from the user
-var bot = new builder.UniversalBot(connector);
+var bot = new builder.UniversalBot(connector, function (session) {
+    session.send('哎呀, 我听不懂你说的\'%s\'. 需要更多支持请回复 \'help\' .', session.message.text);
+});
+
 bot.recognizer(recognizer);
 
 bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
@@ -46,7 +49,7 @@ bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
 });
 
 bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
-    matches: 'None'
+    matches: 'none'
 });
 
 function queryPath4None(session, args) {
