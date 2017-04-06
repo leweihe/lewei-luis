@@ -53,7 +53,7 @@ function queryPath(session, args) {
     //init userData
     var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
 
-    if (entities.length === 0) {
+    if (!entities || entities.length === 0) {
         entities = [session.message.text];
     }
 
