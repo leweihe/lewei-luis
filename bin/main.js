@@ -130,15 +130,22 @@ bot.dialog('backdoor', [function (session, args) {
 bot.dialog('/', [function (session, args) {
     session.send(bot.send(buildCard4Unknown(session)));
 }]);
+//
+// bot.on('conversationUpdate', function (activity) {
+//     // when user joins conversation, send instructions
+//     if (activity.membersAdded) {
+//         activity.membersAdded.forEach(function (identity) {
+//             if (identity.id === activity.address.bot.id) {
+//                 var reply = new builder.Message().address(activity.address).text(instructions);
+//                 bot.send(reply);
+//             }
+//         });
+//     }
+// });
 
-bot.on('conversationUpdate', function (activity) {
-    // when user joins conversation, send instructions
-    if (activity.membersAdded) {
-        activity.membersAdded.forEach(function (identity) {
-            if (identity.id === activity.address.bot.id) {
-                var reply = new builder.Message().address(activity.address).text(instructions);
-                bot.send(reply);
-            }
-        });
-    }
+
+bot.dialog('Help', function (session) {
+    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
+}).triggerAction({
+    matches: 'Help'
 });
