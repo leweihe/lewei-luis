@@ -54,18 +54,27 @@ bot.dialog('Help', function (session) {
 
 dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
 
-bot.dialog('searchPath', [queryPath, choiceExactDest]).triggerAction({
+bot.dialog('searchPath', [askStation, queryPath, choiceExactDest]).triggerAction({
     matches: '路线查询'
 });
 
-bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
-    matches: 'None'
-});
 
-function queryPath4None(session, args) {
-    //init userData
+function askStation(session, args) {
+    var reply = new builder.Message().address(session.message.address);
+    reply.text('请告诉我,你查询的确切地点.');
+    session.send(reply);
+}
+
+function queryPath(session, args) {
     var entities = [{entity: session.message.text, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
+    //
+    // if (args && args.intent && args.intent.entities) {
+    // //init userData
+    //     entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
+    // }
+
     console.log(JSON.stringify(entities));
+
     amap.searchInAmap(entities).then(function (dests) {
         var options = [];
         dests.forEach(function (dest, index) {
@@ -80,28 +89,12 @@ function queryPath4None(session, args) {
     });
 }
 
-function queryPath(session, args) {
-    var entities = [{entity: session.message.text, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
+bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
+    matches: 'None'
+});
 
-    if (args && args.intent && args.intent.entities) {
-    //init userData
-        entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
-    }
-
-    console.log(JSON.stringify(entities));
-
-    amap.searchInAmap(entities).then(function (dests) {
-        var options = [];
-        dests.forEach(function (dest, index) {
-            options.push(dest.name + ' [' + dest.adname + ']');
-        });
-        session.userData.possiblePoints = dests;
-        if (options.length > 0) {
-            builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
-        } else {
-            bot.send(buildCard4Unknown(session));
-        }
-    });
+function queryPath4None(session, args) {
+    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
 }
 
 var buildCard4Unknown = function (session) {
@@ -125,7 +118,13 @@ function choiceExactDest(session, result) {
 bot.dialog('searchWeather', [function (session, args) {
     console.log('正在查询天气' + ', 并返回给' + JSON.stringify(session.message.address));
     var reply = new builder.Message().address(session.message.address);
-    reply.text('为您查询天气');
+    reply.text('请告诉我你所在的城市.我不会偷偷告诉别人的.');
+    session.send(reply);
+},
+function (session){
+    var city = session.message.text;
+    var reply = new builder.Message().address(session.message.address);
+    reply.text('正在为您查询 %s 的天气...', city);
     session.send(reply);
 }]).triggerAction({
     matches: '天气查询'
