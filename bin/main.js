@@ -54,19 +54,28 @@ bot.dialog('Help', function (session) {
 
 dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
 
-bot.dialog('searchPath', [askStation, queryPath, choiceExactDest]).triggerAction({
-    matches: '路线查询'
-});
 
 
-function askStation(session, args) {
-    var reply = new builder.Message().address(session.message.address);
-    reply.text('请告诉我,你查询的确切地点.');
-    session.send(reply);
+function askStation(session, args, next) {
+    if(session.dialogData.searchType) {
+        next({response: session.message.text});
+    } else {
+        session.dialogData.searchType = 'path';
+        session.send('你好,我识别到您正在查询路线,正在为您查询路线.');
+    }
 }
 
+var buildCard4Unknown = function (session) {
+    var reply = new builder.Message().address(session.message.address);
+    reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
+        .title('请告诉我们完整的地址,或者直接使用当前位置')
+        .buttons([
+            builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
+        ]));
+};
+
 function queryPath(session, args) {
-    var entities = [{entity: session.message.text, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
+    var entities = [{entity: args.response, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
     //
     // if (args && args.intent && args.intent.entities) {
     // //init userData
@@ -82,29 +91,12 @@ function queryPath(session, args) {
         });
         session.userData.possiblePoints = dests;
         if (options.length > 0) {
-            builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
+            // builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
         } else {
-            bot.send(buildCard4Unknown(session));
+            // bot.send(buildCard4Unknown(session));
         }
     });
 }
-
-bot.dialog('searchPath4None', [queryPath4None, choiceExactDest]).triggerAction({
-    matches: 'None'
-});
-
-function queryPath4None(session, args) {
-    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
-}
-
-var buildCard4Unknown = function (session) {
-    var reply = new builder.Message().address(session.message.address);
-    reply.attachmentLayout(builder.AttachmentLayout.carousel).addAttachment(new builder.HeroCard(session)
-        .title('请告诉我们完整的地址,或者直接使用当前位置')
-        .buttons([
-            builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'useCurrent=true', '当前位置')
-        ]));
-};
 
 function choiceExactDest(session, result) {
     var reply = new builder.Message().address(session.message.address);
@@ -115,17 +107,34 @@ function choiceExactDest(session, result) {
     });
 }
 
-bot.dialog('searchWeather', [function (session, args) {
+bot.dialog('searchPath', [askStation, queryPath, choiceExactDest]).triggerAction({
+    matches: '路线查询'
+});
+
+bot.dialog('searchPath4None', function (session) {
+    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
+}).triggerAction({
+    matches: 'None'
+});
+
+bot.dialog('searchWeather', [function (session, args, next) {
     console.log('正在查询天气' + ', 并返回给' + JSON.stringify(session.message.address));
-    var reply = new builder.Message().address(session.message.address);
-    reply.text('请告诉我你所在的城市.我不会偷偷告诉别人的.');
-    session.send(reply);
+    var searchType = session.dialogData.searchType = 'weather';
+    if(!searchType) {
+        var reply = new builder.Message().address(session.message.address);
+        reply.text('请告诉我你所在的城市.我不会偷偷告诉别人的.');
+        session.send(reply);
+    } else {
+        next({ response: session.message.text });
+    }
 },
-function (session){
+function (session, results){
+    console.log(JSON.stringify(results));
     var city = session.message.text;
     var reply = new builder.Message().address(session.message.address);
     reply.text('正在为您查询 %s 的天气...', city);
     session.send(reply);
+    session.endDialog();
 }]).triggerAction({
     matches: '天气查询'
 });

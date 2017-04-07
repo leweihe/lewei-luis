@@ -13,7 +13,8 @@ exports.getAmapCard = function (session, builder, dest) {
     var result = [];
     var deferred = Q.defer();
     mongod.findAllBusRoute().then(function (busRoutes) {
-        var queryPoint = session.userData.possiblePoints[dest.index];
+        var queryPoint = session.userData.possiblePoints[0];
+        // var queryPoint = session.userData.possiblePoints[dest.index];
         calcBusRoute(queryPoint, busRoutes).then(function (nearestStation) {
             if (nearestStation) {
                 var chosenOne = {};
