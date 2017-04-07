@@ -19,6 +19,8 @@ var mongod = require('./mongod');
 //LUIS
 var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/aac6c13c-63dc-444e-8f61-7ac4b97fa5ca?subscription-key=96429d5c0efc4cb692dddde6677c0f98&verbose=true&q=';
 
+var HELP_MSG = 'Hi! 试着问问我有关班车或者天气的问题呗! \'火车站怎么走?\', \'明天天气如何?';
+var END_MSG = '很高兴为您服务~';
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -42,24 +44,22 @@ var bot = new builder.UniversalBot(connector);
 var recognizer = new builder.LuisRecognizer(model);
 var dialog = new builder.IntentDialog({ recognizers: [recognizer] });
 bot.dialog('/', dialog);
-dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
+dialog.onDefault(builder.DialogAction.send(HELP_MSG));
 
 bot.recognizer(recognizer);
 
 bot.dialog('Help', function (session) {
-    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
+    session.endDialog(HELP_MSG);
 }).triggerAction({
     matches: 'Help'
 });
-
-dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
 
 function askStation(session, args, next) {
     if(session.dialogData.searchType === 'path') {
         next({response: session.message.text});
     } else {
         session.dialogData.searchType = 'path';
-        session.send('你好,我识别到您正在查询路线,正在为您查询路线.请告诉我你所要去的完整地址.');
+        session.send('我识别到您正在查询路线,正在为您查询路线.请告诉我你所要去的完整地址.');
     }
 }
 
@@ -108,7 +108,7 @@ function choiceExactDest(session, result) {
     amap.getAmapCard(session, builder, result.response).then(function (amapCards) {
         reply.attachmentLayout(builder.AttachmentLayout.carousel).attachments(amapCards);
         session.send(reply);
-        session.end();
+        session.endDialog(END_MSG);
     });
 }
 
@@ -117,7 +117,7 @@ bot.dialog('searchPath', [askStation, queryPath, choiceExactDest]).triggerAction
 });
 
 bot.dialog('searchPath4None', function (session) {
-    session.endDialog('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\'');
+    session.endDialog(HELP_MSG);
 }).triggerAction({
     matches: 'None'
 });
@@ -127,7 +127,7 @@ bot.dialog('searchWeather', [function (session, args, next) {
 
     if(!session.dialogData.searchType) {
         var reply = new builder.Message().address(session.message.address);
-        reply.text('请告诉我你所在的城市.我不会偷偷告诉别人的.');
+        reply.text('告诉我你所在的城市.我不会偷偷告诉别人的.');
         session.dialogData.searchType = 'weather';
         session.send(reply);
     } else {
@@ -140,7 +140,7 @@ function (session, results){
     var reply = new builder.Message().address(session.message.address);
     reply.text('正在为您查询 %s 的天气...', city);
     session.send(reply);
-    session.endDialog();
+    session.endDialog(END_MSG);
 }]).triggerAction({
     matches: '天气查询'
 });
