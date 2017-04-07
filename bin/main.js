@@ -119,10 +119,11 @@ bot.dialog('searchPath4None', function (session) {
 
 bot.dialog('searchWeather', [function (session, args, next) {
     console.log('正在查询天气' + ', 并返回给' + JSON.stringify(session.message.address));
-    var searchType = session.dialogData.searchType = 'weather';
-    if(!searchType) {
+
+    if(!session.dialogData.searchType) {
         var reply = new builder.Message().address(session.message.address);
         reply.text('请告诉我你所在的城市.我不会偷偷告诉别人的.');
+        session.dialogData.searchType = 'weather';
         session.send(reply);
     } else {
         next({ response: session.message.text });
