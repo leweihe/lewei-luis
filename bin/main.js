@@ -54,14 +54,12 @@ bot.dialog('Help', function (session) {
 
 dialog.onDefault(builder.DialogAction.send('Hi! 试着问问我有关班车的问题呗! \'火车站怎么走?\', \'汽车站在哪?\' 或者 \'软件园\''));
 
-
-
 function askStation(session, args, next) {
-    if(session.dialogData.searchType) {
+    if(session.dialogData.searchType === 'path') {
         next({response: session.message.text});
     } else {
         session.dialogData.searchType = 'path';
-        session.send('你好,我识别到您正在查询路线,正在为您查询路线.');
+        session.send('你好,我识别到您正在查询路线,正在为您查询路线.请告诉我你所要去的完整地址.');
     }
 }
 
@@ -74,28 +72,35 @@ var buildCard4Unknown = function (session) {
         ]));
 };
 
-function queryPath(session, args) {
-    var entities = [{entity: args.response, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
-    //
-    // if (args && args.intent && args.intent.entities) {
-    // //init userData
-    //     entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
-    // }
+function queryPath(session, args, next) {
+    if(session.dialogData.searchEntity) {
+        next({response: session.dialogData.searchEntity});
+    } else {
+        var entities = [{entity: args.response, type: "地点", startIndex: 0, endIndex: 2, score: 0.9999676}];
+        //
+        // if (args && args.intent && args.intent.entities) {
+        // //init userData
+        //     entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
+        // }
 
-    console.log(JSON.stringify(entities));
+        console.log(JSON.stringify(entities));
 
-    amap.searchInAmap(entities).then(function (dests) {
-        var options = [];
-        dests.forEach(function (dest, index) {
-            options.push(dest.name + ' [' + dest.adname + ']');
+        amap.searchInAmap(entities).then(function (dests) {
+            var options = [];
+            dests.forEach(function (dest, index) {
+                options.push(dest.name + ' [' + dest.adname + ']');
+            });
+            session.userData.possiblePoints = dests;
+            if (options.length > 0) {
+                session.dialogData.searchEntity = options[0];
+                // builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
+                session.send('正在为您查询%s' , options[0]);
+                next({response: session.dialogData.searchEntity});
+            } else {
+                // bot.send(buildCard4Unknown(session));
+            }
         });
-        session.userData.possiblePoints = dests;
-        if (options.length > 0) {
-            // builder.Prompts.choice(session, "为您列出了以下三个可能的路径,请选择", options);
-        } else {
-            // bot.send(buildCard4Unknown(session));
-        }
-    });
+    }
 }
 
 function choiceExactDest(session, result) {
