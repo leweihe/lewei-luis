@@ -26,7 +26,7 @@ exports.getAmapCard = function (session, builder, dest) {
                     });
                 });
                 result.push(new builder.HeroCard(session)
-                    .title('去[' + dest.entity + ']的最佳路线为[' + chosenOne.routeName + ']路班车')
+                    .title('去' + dest + '的最佳路线为[' + chosenOne.routeName + ']路班车')
                     .subtitle('建议站点为[' + nearestStation.keyword + ']')
                     .buttons([
                         builder.CardAction.openUrl(session, process.env.LINDE_BUS_URL + 'lng=' + queryPoint.location.split(',')[0] + '&lat=' + queryPoint.location.split(',')[1], '查看路线')
