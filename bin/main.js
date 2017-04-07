@@ -55,14 +55,13 @@ bot.dialog('Help', function (session) {
 });
 
 function askStation(session, args, next) {
-
-
     if(session.dialogData.searchType === 'path') {
         next({response: session.message.text});
     } else {
         var entities = builder.EntityRecognizer.findAllEntities(args.intent.entities, '地点');
         if(entities && entities.length) {
-            next({response: entities[0].name});
+            console.log(JSON.stringify(entities[0]));
+            next({response: entities[0].entity});
         } else {
             session.dialogData.searchType = 'path';
             session.send('我识别到您正在查询路线,正在为您查询路线.请告诉我你所要去的完整地址.');
