@@ -114,7 +114,8 @@ function choiceExactDest(session, result) {
     amap.getAmapCard(session, builder, result.response).then(function (amapCards) {
         reply.attachmentLayout(builder.AttachmentLayout.carousel).attachments(amapCards);
         session.send(reply);
-        session.endDialog(END_MSG);
+        // session.endDialog(END_MSG);
+        session.endDialog();
     });
 }
 
@@ -144,9 +145,10 @@ function (session, results){
     console.log(JSON.stringify(results));
     var city = session.message.text;
     var reply = new builder.Message().address(session.message.address);
-    reply.text('正在为您查询 %s 的天气...', city);
+    // reply.text('正在为您查询 %s 的天气...', city);
     session.send(reply);
-    session.endDialog(END_MSG);
+    // session.endDialog(END_MSG);
+    session.endDialog();
 }]).triggerAction({
     matches: '天气查询'
 });
